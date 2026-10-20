@@ -1,7 +1,7 @@
 // Service Worker: guarda la aplicación para que funcione sin conexión. No guarda datos de campo
 // (esos están en IndexedDB) ni archivos fuera de la lista (p. ej. datos_entrada o pruebas).
 
-const VERSION = 'pavc-app-v17';
+const VERSION = 'pavc-app-v18';
 const ARCHIVOS = [
   './', './index.html', './manifest.webmanifest', './icons/icon.svg', './css/app.css',
   './js/app.js', './js/app-ctx.js', './js/config.js', './js/db.js', './js/ids.js', './js/geo.js', './js/rules.js', './js/states.js', './js/repo.js',

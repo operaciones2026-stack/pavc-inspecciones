@@ -27,6 +27,15 @@ export const app = {
   get nombreBase() { return NOMBRES_BASE[this.modo]; },
   /** Cualquier base que no sea la de campo (demo o piloto): datos no oficiales y servidor simulado. */
   get esDemo() { return this.modo !== 'campo'; },
+  /** Vista de administración (configuración técnica). Los inspectores en CAMPO ven sólo lo necesario para registrar.
+   *  Se activa abriendo la app con ?admin=1 y se desactiva con ?admin=0 (queda recordado en este navegador). */
+  get esAdmin() {
+    try {
+      const q = new URLSearchParams(location.search).get('admin');
+      if (q === '1' || q === '0') localStorage.setItem('pavc_admin', q);
+      return this.modo !== 'campo' || localStorage.getItem('pavc_admin') === '1';
+    } catch { return this.modo !== 'campo'; }
+  },
   get etiquetaModo() { return { campo: 'CAMPO', demo: 'DEMO', piloto: 'PILOTO' }[this.modo]; },
   /** Destino de sincronización de la base abierta: { destino: 'ninguno'|'simulado'|'google', url, clientId }. */
   syncConfig: null,

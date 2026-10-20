@@ -13,6 +13,8 @@ export async function render(main) {
   const conservar = !!(await getMeta('conservar_original'));
   const cola = await resumenCola();
   const sc = app.syncConfig || app.configSyncPorDefecto();
+  const admin = app.esAdmin;
+  main.classList.toggle('modo-inspector', !admin);
   main.innerHTML = `
   <section class="tarjeta"><h2>Perfil del dispositivo</h2>
     <form id="f-perfil" class="rejilla">
@@ -20,9 +22,9 @@ export async function render(main) {
       <label class="campo"><span>Cuadrilla</span><input name="cuadrilla" value="${esc(app.perfil.cuadrilla)}" placeholder="Ej.: Cuadrilla 1"></label>
       <div class="campo"><span>&nbsp;</span><button class="btn btn-primario">Guardar perfil</button></div>
     </form>
-    <p class="nota">Etapas 2–3: perfil local sin contraseña. Dispositivo: ${esc(app.dispositivo_id)}.</p>
+    <p class="nota solo-admin">Etapas 2–3: perfil local sin contraseña. Dispositivo: ${esc(app.dispositivo_id)}.</p>
   </section>
-  <section class="tarjeta"><h2>Base de datos en uso: ${{ campo: 'CAMPO', demo: 'DEMOSTRACIÓN', piloto: 'PRUEBA PILOTO' }[app.modo]}</h2>
+  <section class="tarjeta solo-admin"><h2>Base de datos en uso: ${{ campo: 'CAMPO', demo: 'DEMOSTRACIÓN', piloto: 'PRUEBA PILOTO' }[app.modo]}</h2>
     <p>Las bases <b>campo</b>, <b>demostración</b> y <b>prueba piloto</b> están separadas: los datos de una nunca aparecen en las otras. La demostración y el piloto usan datos de prueba, no oficiales.</p>
     <div class="acciones-fila">
       <button class="btn" id="btn-modo">Cambiar a ${app.esDemo ? 'CAMPO' : 'DEMOSTRACIÓN'}</button>
@@ -30,8 +32,9 @@ export async function render(main) {
       ${app.esDemo ? `<button class="btn btn-peligro-sutil" id="btn-borrar-demo">Vaciar base de ${app.modo === 'piloto' ? 'prueba piloto' : 'demostración'}</button>` : ''}
     </div>
   </section>
-  <section class="tarjeta"><h2>Importar programa maestro</h2>
-    <p>Seleccione el <b>Programa Maestro</b> (hojas Base_Maestra, Programa, Cronograma, Sectores, Incidencias_QC, Antecedentes_Muestreo) y el <b>Formato de Inspección</b> (hojas Listas y Ficha_Inspeccion). Los archivos sólo se leen; no se modifican.</p>
+  <section class="tarjeta${maestro ? ' solo-admin' : ''}"><h2>Importar programa maestro</h2>
+    ${admin ? '' : '<p><b>Primer uso en este equipo:</b> seleccione los 2 archivos Excel que le entregó la coordinación y pulse <b>Leer y validar</b> y luego <b>Confirmar importación</b>.</p>'}
+    <p class="solo-admin">Seleccione el <b>Programa Maestro</b> (hojas Base_Maestra, Programa, Cronograma, Sectores, Incidencias_QC, Antecedentes_Muestreo) y el <b>Formato de Inspección</b> (hojas Listas y Ficha_Inspeccion). Los archivos sólo se leen; no se modifican.</p>
     <form id="f-imp" class="rejilla">
       <label class="campo"><span>Programa Maestro (.xlsx)</span><input type="file" name="pm" accept=".xlsx" required></label>
       <label class="campo"><span>Formato de Inspección (.xlsx)</span><input type="file" name="fi" accept=".xlsx" required></label>
@@ -40,18 +43,20 @@ export async function render(main) {
     <div id="rep-imp"></div>
     <p class="nota">Maestro actual: ${maestro ? `${esc(maestro.archivoPM)} + ${esc(maestro.archivoFI)} · ${fmtFechaHora(maestro.importado_en)} · ${esc(maestro.conteos?.locaciones)} locaciones` : 'ninguno'}</p>
   </section>
-  <section class="tarjeta"><h2>Exportar (respaldo y entrega)</h2>
-    <p>Genera un <b>Excel nuevo</b> (D2) con las hojas Info, Resumen, Locaciones_Avance, Inspecciones, Checklist_Respuestas, Hallazgos, Acciones, Verificaciones, Evidencias, Historial_Estados y Alertas.${app.esDemo ? ' <b>Base de demostración: el archivo se marca como DEMO.</b>' : ''}</p>
+  <section class="tarjeta"><h2>${admin ? 'Exportar (respaldo y entrega)' : 'Respaldo del dispositivo'}</h2>
+    ${admin ? '' : '<p>Guarda en este equipo una copia de todo lo registrado (Excel + fotos). Úsela si se lo pide la coordinación.</p>'}
+    <p class="solo-admin">Genera un <b>Excel nuevo</b> (D2) con las hojas Info, Resumen, Locaciones_Avance, Inspecciones, Checklist_Respuestas, Hallazgos, Acciones, Verificaciones, Evidencias, Historial_Estados y Alertas.${app.esDemo ? ' <b>Base de demostración: el archivo se marca como DEMO.</b>' : ''}</p>
     <div class="acciones-fila">
-      <button class="btn btn-primario" data-exp="xlsx">Excel (.xlsx)</button>
-      <button class="btn" data-exp="csv">CSV por tabla (.zip)</button>
+      <button class="btn btn-primario solo-admin" data-exp="xlsx">Excel (.xlsx)</button>
+      <button class="btn solo-admin" data-exp="csv">CSV por tabla (.zip)</button>
       <button class="btn" data-exp="zip">Respaldo completo: Excel + fotos (.zip)</button>
     </div>
     <div id="rep-exp"></div>
   </section>
   <section class="tarjeta"><h2>Sincronización</h2>
-    <p>Operaciones: ${cola.pendiente} pendientes · ${cola.error} con error · ${cola.sincronizado} sincronizadas. Los datos del dispositivo nunca se borran al sincronizar.</p>
-    <form id="f-sync" class="rejilla">
+    <p class="solo-admin">Operaciones: ${cola.pendiente} pendientes · ${cola.error} con error · ${cola.sincronizado} sincronizadas. Los datos del dispositivo nunca se borran al sincronizar.</p>
+    ${admin ? '' : '<p>1) Inicie sesión con su cuenta Google autorizada. 2) Cuando tenga señal, pulse <b>Sincronizar ahora</b>. Si no hay señal, todo queda guardado en el equipo y se envía después.</p>'}
+    <form id="f-sync" class="rejilla solo-admin">
       <label class="campo"><span>Destino de esta base (${esc(app.nombreBase)})</span><select name="destino">
         ${app.esDemo ? '' : `<option value="ninguno"${sc.destino === 'ninguno' ? ' selected' : ''}>Ninguno (sólo en el dispositivo)</option>`}
         ${app.esDemo ? `<option value="simulado"${sc.destino === 'simulado' ? ' selected' : ''}>Servidor simulado (local)</option>` : ''}
@@ -62,8 +67,8 @@ export async function render(main) {
     </form>
     <div data-google>
       <p id="sesion-google" class="nota"></p>
-      <div class="acciones-fila"><div id="boton-google"></div><button class="btn" id="btn-ping" type="button">Probar conexión</button><button class="btn-link" id="btn-salir" type="button">Cerrar sesión de Google</button></div>
-      <p class="nota">Sólo identidad (correo): la aplicación no recibe permisos sobre Drive ni Sheets. El servidor acepta sólo usuarios autorizados y las bases permitidas.</p>
+      <div class="acciones-fila"><div id="boton-google"></div><button class="btn solo-admin" id="btn-ping" type="button">Probar conexión</button><button class="btn-link" id="btn-salir" type="button">Cerrar sesión de Google</button></div>
+      <p class="nota solo-admin">Sólo identidad (correo): la aplicación no recibe permisos sobre Drive ni Sheets. El servidor acepta sólo usuarios autorizados y las bases permitidas.</p>
     </div>
     <div data-simulado>
       <label class="chk"><input type="checkbox" id="sim-sinred"> Simular sin conexión</label>
@@ -73,7 +78,7 @@ export async function render(main) {
     <div class="acciones-fila"><button class="btn btn-primario" id="btn-sync">Sincronizar ahora</button></div>
     <div id="rep-sync"></div>
   </section>
-  <section class="tarjeta"><h2>Fotografías y almacenamiento</h2>
+  <section class="tarjeta solo-admin"><h2>Fotografías y almacenamiento</h2>
     <label class="chk"><input type="checkbox" id="chk-original" ${conservar ? 'checked' : ''}> Conservar también la foto original (duplica el espacio; D-09: desactivado por defecto)</label>
     <p id="almac" class="nota"></p>
   </section>`;
