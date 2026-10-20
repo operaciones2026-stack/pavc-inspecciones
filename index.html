@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Inspecciones PAVC – Lotes VI y VII</title>
+  <meta name="description" content="Registro de inspecciones, hallazgos y evidencias del Plan de Abandono (PAVC) Lotes VI y VII. Funciona sin conexión.">
+  <meta name="theme-color" content="#1f4e5f">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="saltar" href="#principal">Saltar al contenido</a>
+  <div id="franja-demo" class="franja-demo" hidden>MODO DEMOSTRACIÓN · datos ficticios · no oficiales</div>
+  <header class="cabecera">
+    <div class="marca"><span class="logo" aria-hidden="true">◆</span><div><b>Inspecciones PAVC</b><small>Lotes VI y VII · <span id="modo">CAMPO</span></small></div></div>
+    <div class="estado"><span id="estado-red"></span><span id="estado-sync"></span><button id="actualizar" class="btn btn-sm" hidden>Actualizar aplicación</button></div>
+  </header>
+  <nav class="nav" aria-label="Principal">
+    <a href="#/inicio">Inicio</a><a href="#/buscar">Buscar</a><a href="#/historial">Historial</a><a href="#/datos">Datos</a>
+  </nav>
+  <main id="principal" tabindex="-1"><p class="cargando">Cargando…</p></main>
+  <div id="avisos" class="avisos" aria-live="polite"></div>
+  <noscript>Esta aplicación necesita JavaScript.</noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

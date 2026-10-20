@@ -1,0 +1,14 @@
+{
+  "name": "Inspecciones PAVC – Lotes VI y VII",
+  "short_name": "PAVC",
+  "description": "Inspecciones, hallazgos y evidencias del Plan de Abandono PAVC (prototipo local).",
+  "lang": "es",
+  "start_url": "./#/inicio",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f7",
+  "theme_color": "#1f4e5f",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
